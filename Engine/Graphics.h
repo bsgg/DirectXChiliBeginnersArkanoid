@@ -60,7 +60,7 @@ public:
 	void DrawRect(int x0, int y0, int x1, int y1, Color c);
 	void DrawRect(const RectF& rect, Color c)
 	{
-		DrawRect((int)rect.left, (int)rect.top, (int)rect.right, (int)rect.bottom, c);
+		DrawRect(int(rect.left), (int)(rect.top), (int)(rect.right), (int)(rect.bottom), c);
 	}
 	
 	~Graphics();
