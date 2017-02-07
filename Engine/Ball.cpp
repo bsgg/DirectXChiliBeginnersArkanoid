@@ -11,3 +11,8 @@ void Ball::Draw(Graphics & gfx) const
 {
 	SpriteCodex::DrawBall(pos, gfx);
 }
+
+void Ball::Update(float dt)
+{
+	pos += vel * dt;
+}
