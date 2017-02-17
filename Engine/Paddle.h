@@ -18,6 +18,10 @@ public:
 	RectF GetRect() const;
 
 private:
+
+	// Width for the wings
+	static constexpr float wingWidth = 20.0f;
+	Color wingColor = Colors::Red;
 	Color color = Colors::White;
 	float speed = 300.0f;
 	float halfWidth;
