@@ -33,7 +33,7 @@ Game::Game(MainWindow& wnd)
 {
 	// Colors for each break
 	const Color colors[4] = { Colors::Red, Colors::Green, Colors::Blue, Colors::Cyan };
-	const Vec2 topLeft(0.0f, 0.0f);
+	const Vec2 topLeft(40.0f, 40.0f);
 
 	int i = 0;
 	for (int y = 0; y < nBricksDown; y++)
@@ -67,14 +67,39 @@ void Game::UpdateModel()
 
 	ball.Update(dt);
 	
-	for (Brick& b : bricks)
+	// Check best collision (closest collision) between ball and any brick
+	bool collisionHappened = false;
+	float curColDist;
+	int curCollisionIndex;
+	for (int i= 0; i<nBricks; i++)
 	{
-		if (b.DoBallCollision(ball))
+		if (bricks[i].CheckBallCollision(ball))
 		{
-			soundBrick.Play();
-			break;
+			const float newColDistanceSqr = (ball.GetPosition() - bricks[i].GetCenter()).GetLengthSq();
+			if (collisionHappened)
+			{
+				if (newColDistanceSqr < curColDist)
+				{
+					curColDist = newColDistanceSqr;
+					curCollisionIndex = i;
+				}
+			}
+			else
+			{
+				curColDist = newColDistanceSqr;
+				curCollisionIndex = i;
+				collisionHappened = true;
+			}
 		}
 	}
+
+	// Executre collision between ball and the brick
+	if (collisionHappened)
+	{
+		bricks[curCollisionIndex].ExecuteBallCollision(ball);
+		soundBrick.Play();
+	}
+
 
 	if (paddle.DoBallCollision(ball))
 	{
