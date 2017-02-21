@@ -12,10 +12,11 @@ class Paddle
 public:
 	Paddle(const Vec2& pos_in, float halfWidth_in, float halfHeight_in);
 	void Draw(Graphics& gfx) const;
-	bool DoBallCollision(Ball& ball) const;
+	bool DoBallCollision(Ball& ball);
 	void DoWallCollision(const RectF& walls);
 	void Update(const Keyboard& kb, float dt);
 	RectF GetRect() const;
+	void ResetCooldown();
 
 private:
 
@@ -27,4 +28,7 @@ private:
 	float halfWidth;
 	float halfHeight;
 	Vec2 pos;
+
+	// Cooldown for the collision with the ball. 
+	bool isCooldown = false;
 };

@@ -53,15 +53,21 @@ Game::Game(MainWindow& wnd)
 void Game::Go()
 {
 	gfx.BeginFrame();	
-	UpdateModel();
+
+	float elapsedTime = ft.Mark();
+	while (elapsedTime > 0.0f)
+	{
+		const float dt = std::min(0.0025f, elapsedTime);
+		UpdateModel(dt);
+		elapsedTime -= dt;
+	}
+	
 	ComposeFrame();
 	gfx.EndFrame();
 }
 
-void Game::UpdateModel()
+void Game::UpdateModel(float dt)
 {
-	const float dt = ft.Mark();
-
 	paddle.Update(wnd.kbd, dt);
 
 	paddle.DoWallCollision(walls);
@@ -97,6 +103,7 @@ void Game::UpdateModel()
 	// Executre collision between ball and the brick
 	if (collisionHappened)
 	{
+		paddle.ResetCooldown();
 		bricks[curCollisionIndex].ExecuteBallCollision(ball);
 		soundBrick.Play();
 	}
@@ -109,6 +116,7 @@ void Game::UpdateModel()
 
 	if (ball.DoWallCollision(walls))
 	{
+		paddle.ResetCooldown();
 		soundPad.Play();
 	}
 }
