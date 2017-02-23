@@ -59,6 +59,8 @@ private:
 	RectF walls;
 	Sound soundPad;
 	Sound soundBrick;
+	Sound soundFart;
+	bool gameIsOver = false;
 
 	Brick bricks[nBricks];
 	Paddle paddle;
