@@ -26,15 +26,12 @@ bool Paddle::DoBallCollision(Ball & ball)
 			const Vec2 ballPos = ball.GetPosition();
 
 			// Check which kind of approach are we doing (inside or outside)
-			if (std::signbit(ball.GetVelocity().x) == std::signbit((ballPos - pos).x))
+			if ((std::signbit(ball.GetVelocity().x) == std::signbit((ballPos - pos).x)) ||
+				(ballPos.x >= rect.left && ballPos.x <= rect.right))
 			{
 				// Aproaching from inside, will do reboundY			
 				ball.ReboundY();
-			}
-			else if (ballPos.x >= rect.left && ballPos.x <= rect.right)
-			{
-				ball.ReboundY();
-			}
+			}			
 			else
 			{
 				ball.ReboundX();
