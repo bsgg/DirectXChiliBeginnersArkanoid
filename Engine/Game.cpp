@@ -32,6 +32,7 @@ Game::Game(MainWindow& wnd)
 	soundPad(L"Sounds\\arkpad.wav"),
 	soundBrick(L"Sounds\\arkbrick.wav"),
 	soundFart(L"Sounds\\fart.wav"),
+	soundReady(L"Sounds\\ready.wav"),
 	paddle(Vec2(400.0f, 550.0f), 32.0f, 6.0f)
 {
 
@@ -133,17 +134,35 @@ void Game::UpdateModel(float dt)
 	{
 		if (wnd.kbd.KeyIsPressed(VK_RETURN))
 		{
+			StartRound();
+		}
+	}
+	else if (gameState == 3)
+	{
+		if ((curWaitTime += dt) > readyWaitTime)
+		{
 			gameState = 1;
 		}
 	}
 }
 
+void Game::StartRound()
+{
+	curWaitTime = 0.0f;
+	soundReady.Play();
+	gameState = 3;
+}
+
 void Game::ComposeFrame()
 {
+	if ((gameState == 1) || (gameState == 3))
+	{
+		paddle.Draw(gfx);
+	}
+
 	if (gameState == 1)
 	{
 		ball.Draw(gfx);
-		paddle.Draw(gfx);
 	}
 
 	if (gameState != 0)
@@ -166,5 +185,10 @@ void Game::ComposeFrame()
 	if (gameState == 2)
 	{
 		SpriteCodex::DrawGameOver(Graphics::GetScreenRect().GetCenter(), gfx);
+	}
+
+	if (gameState == 3)
+	{
+		SpriteCodex::DrawReady(Graphics::GetScreenRect().GetCenter(), gfx);
 	}
 }
