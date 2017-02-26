@@ -31,22 +31,19 @@ Game::Game(MainWindow& wnd)
 	soundPad(L"Sounds\\arkpad.wav"),
 	soundBrick(L"Sounds\\arkbrick.wav"),
 	soundFart(L"Sounds\\fart.wav"),
-	paddle(Vec2(400.0f, 500.0f), 50.0f, 15.0f)
+	paddle(Vec2(400.0f, 550.0f), 32.0f, 6.0f)
 {
-	// Colors for each break
-	const Color colors[4] = { Colors::Red, Colors::Green, Colors::Blue, Colors::Cyan };
-	const Vec2 topLeft(40.0f, 40.0f);
 
+	const Vec2 gridTopLeft(walls.GetInnerBounds().left, walls.GetInnerBounds().top + topSpace);
 	int i = 0;
 	for (int y = 0; y < nBricksDown; y++)
 	{
-		const Color c = colors[y];
+		const Color c = brickColors[y];
 		for (int x = 0; x < nBricksAcross; x++)
 		{			
-			bricks[i] = Brick( RectF (topLeft + 
+			bricks[i] = Brick( RectF (gridTopLeft +
 				Vec2(x *brickWidth, y * brickHeight), brickWidth, brickHeight), 
-				c);
-			
+				c);			
 			i++;
 		}
 	}

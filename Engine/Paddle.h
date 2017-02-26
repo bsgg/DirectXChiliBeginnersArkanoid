@@ -20,11 +20,11 @@ public:
 
 private:
 
-	static constexpr Color wingColor = Colors::Red;
-	static constexpr Color color = Colors::White;
+	static constexpr Color wingColor = { 210,255,210 };
+	static constexpr Color color = {200,200,200};
 	// Width for the wings
-	static constexpr float wingWidth = 18.0f;
-	static constexpr float speed = 300.0f;
+	static constexpr float wingWidth = 6.0f;
+	static constexpr float speed = 360.0f;
 
 	// Control the paddle rebound behaviour
 	static constexpr float maximunExitRation = 2.6f;
