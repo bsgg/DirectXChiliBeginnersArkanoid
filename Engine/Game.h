@@ -62,6 +62,9 @@ private:
 	static constexpr Color brickColors[4] = { { 230,0,0 },{ 0,230,0 },{ 0,0,230 },{ 0,230,230 } };
 	static constexpr Color wallColor = { 20,60,200 };
 	
+	// 0: not started 1:playing 2: game over
+	int gameState = 0;
+
 	FrameTimer ft;
 	Ball ball;
 	Walls walls;
@@ -70,7 +73,6 @@ private:
 	Sound soundPad;
 	Sound soundBrick;
 	Sound soundFart;
-	bool gameIsOver = false;
 
 	Brick bricks[nBricks];
 	Paddle paddle;
