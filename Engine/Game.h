@@ -28,6 +28,7 @@
 #include "Sound.h"
 #include "Brick.h"
 #include "Paddle.h"
+#include "Walls.h"
 
 class Game
 {
@@ -53,10 +54,18 @@ private:
 	static constexpr int nBricksAcross = 18;
 	static constexpr int nBricksDown = 4;
 	static constexpr int nBricks = nBricksAcross * nBricksDown;
+
+	static constexpr float topSpace = brickHeight * 1.6f;
+	static constexpr float wallThickness = 12.0f;
+	static constexpr float fieldWidth = float(nBricksAcross) * brickWidth;
+	static constexpr float fieldHeight = float(Graphics::ScreenHeight) - wallThickness * 2.0f;
+	static constexpr Color wallColor = { 20,60,200 };
 	
 	FrameTimer ft;
 	Ball ball;
-	RectF walls;
+	Walls walls;
+
+
 	Sound soundPad;
 	Sound soundBrick;
 	Sound soundFart;
