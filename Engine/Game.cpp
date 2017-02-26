@@ -113,7 +113,6 @@ void Game::UpdateModel(float dt)
 			soundBrick.Play();
 		}
 
-
 		if (paddle.DoBallCollision(ball))
 		{
 			soundPad.Play();
@@ -123,7 +122,11 @@ void Game::UpdateModel(float dt)
 		// Collision with walls
 		if (ballWallColResult == 1)
 		{
-			paddle.ResetCooldown();
+			if (!paddle.GetRect().IsOverlappingWidth(ball.GetRect()))
+			{
+				paddle.ResetCooldown();
+			}
+			
 			soundPad.Play();
 		}
 		else if (ballWallColResult == 2)
