@@ -29,6 +29,7 @@
 #include "Brick.h"
 #include "Paddle.h"
 #include "Walls.h"
+#include "LifeCounter.h"
 
 class Game
 {
@@ -44,6 +45,7 @@ private:
 	/*  User Functions              */
 	/********************************/
 	void StartRound();
+	void ResetBall();
 private:
 	MainWindow& wnd;
 	Graphics gfx;
@@ -72,6 +74,7 @@ private:
 	Walls walls;
 	Brick bricks[nBricks];
 	Paddle paddle;
+	LifeCounter lifeCounter;
 
 	float curWaitTime;
 	Sound soundPad;

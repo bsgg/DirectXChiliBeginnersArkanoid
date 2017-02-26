@@ -33,7 +33,8 @@ Game::Game(MainWindow& wnd)
 	soundBrick(L"Sounds\\arkbrick.wav"),
 	soundFart(L"Sounds\\fart.wav"),
 	soundReady(L"Sounds\\ready.wav"),
-	paddle(Vec2(400.0f, 550.0f), 32.0f, 6.0f)
+	paddle(Vec2(400.0f, 550.0f), 32.0f, 6.0f),
+	lifeCounter({ 30.0f,30.0f }, 3)
 {
 
 	const Vec2 gridTopLeft(walls.GetInnerBounds().left, walls.GetInnerBounds().top + topSpace);
@@ -49,6 +50,8 @@ Game::Game(MainWindow& wnd)
 			i++;
 		}
 	}
+
+	ResetBall();
 }
 
 void Game::Go()
@@ -126,7 +129,8 @@ void Game::UpdateModel(float dt)
 		}
 		else if (ballWallColResult == 2)
 		{
-			gameState = 2;
+			StartRound();
+			ResetBall();
 			soundFart.Play();
 		}
 	}
@@ -148,9 +152,22 @@ void Game::UpdateModel(float dt)
 
 void Game::StartRound()
 {
-	curWaitTime = 0.0f;
-	soundReady.Play();
-	gameState = 3;
+	if (lifeCounter.ConsumeLife())
+	{
+		curWaitTime = 0.0f;
+		soundReady.Play();
+		gameState = 3;
+	}
+	else
+	{
+		gameState = 2;
+	}
+	
+}
+
+void Game::ResetBall()
+{
+	ball = Ball(Graphics::GetScreenRect().GetCenter(), Vec2(-0.55f, -1.0f));
 }
 
 void Game::ComposeFrame()
@@ -158,6 +175,7 @@ void Game::ComposeFrame()
 	if ((gameState == 1) || (gameState == 3))
 	{
 		paddle.Draw(gfx);
+		lifeCounter.Draw(gfx);
 	}
 
 	if (gameState == 1)
