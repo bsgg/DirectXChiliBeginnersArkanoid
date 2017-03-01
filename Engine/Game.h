@@ -46,6 +46,16 @@ private:
 	/********************************/
 	void StartRound();
 	void ResetBall();
+
+private:
+	enum class EGameState
+	{
+		NoStarted,
+		ReadyWait,
+		Playing,
+		GameOver
+		
+	};
 private:
 	MainWindow& wnd;
 	Graphics gfx;
@@ -67,7 +77,7 @@ private:
 	static constexpr float readyWaitTime = 4.3f;
 
 	// 0: not started 1:playing 2: game over
-	int gameState = 0;
+	EGameState gameState = EGameState::NoStarted;
 
 	FrameTimer ft;
 	Ball ball;

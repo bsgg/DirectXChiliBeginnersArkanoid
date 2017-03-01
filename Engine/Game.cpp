@@ -71,84 +71,91 @@ void Game::Go()
 
 void Game::UpdateModel(float dt)
 {
-	if (gameState == 1)
+	switch (gameState)
 	{
-		paddle.Update(wnd.kbd, dt);
-
-		paddle.DoWallCollision(walls.GetInnerBounds());
-
-		ball.Update(dt);
-
-		// Check best collision (closest collision) between ball and any brick
-		bool collisionHappened = false;
-		float curColDist;
-		int curCollisionIndex;
-		for (int i = 0; i < nBricks; i++)
+		case EGameState::Playing:
 		{
-			if (bricks[i].CheckBallCollision(ball))
+			paddle.Update(wnd.kbd, dt);
+
+			paddle.DoWallCollision(walls.GetInnerBounds());
+
+			ball.Update(dt);
+
+			// Check best collision (closest collision) between ball and any brick
+			bool collisionHappened = false;
+			float curColDist;
+			int curCollisionIndex;
+			for (int i = 0; i < nBricks; i++)
 			{
-				const float newColDistanceSqr = (ball.GetPosition() - bricks[i].GetCenter()).GetLengthSq();
-				if (collisionHappened)
+				if (bricks[i].CheckBallCollision(ball))
 				{
-					if (newColDistanceSqr < curColDist)
+					const float newColDistanceSqr = (ball.GetPosition() - bricks[i].GetCenter()).GetLengthSq();
+					if (collisionHappened)
+					{
+						if (newColDistanceSqr < curColDist)
+						{
+							curColDist = newColDistanceSqr;
+							curCollisionIndex = i;
+						}
+					}
+					else
 					{
 						curColDist = newColDistanceSqr;
 						curCollisionIndex = i;
+						collisionHappened = true;
 					}
 				}
-				else
-				{
-					curColDist = newColDistanceSqr;
-					curCollisionIndex = i;
-					collisionHappened = true;
-				}
 			}
-		}
 
-		// Executre collision between ball and the brick
-		if (collisionHappened)
-		{
-			paddle.ResetCooldown();
-			bricks[curCollisionIndex].ExecuteBallCollision(ball);
-			soundBrick.Play();
-		}
-
-		if (paddle.DoBallCollision(ball))
-		{
-			soundPad.Play();
-		}
-
-		const int ballWallColResult = ball.DoWallCollision(walls.GetInnerBounds());
-		// Collision with walls
-		if (ballWallColResult == 1)
-		{
-			if (!paddle.GetRect().IsOverlappingWidth(ball.GetRect()))
+			// Executre collision between ball and the brick
+			if (collisionHappened)
 			{
 				paddle.ResetCooldown();
+				bricks[curCollisionIndex].ExecuteBallCollision(ball);
+				soundBrick.Play();
 			}
-			
-			soundPad.Play();
+
+			if (paddle.DoBallCollision(ball))
+			{
+				soundPad.Play();
+			}
+
+			const Ball::EWallCollision ballWallColResult = ball.DoWallCollision(walls.GetInnerBounds());
+			// Collision with walls
+			if (ballWallColResult == Ball::EWallCollision::WallCollision)
+			{
+				if (!paddle.GetRect().IsOverlappingWidth(ball.GetRect()))
+				{
+					paddle.ResetCooldown();
+				}
+
+				soundPad.Play();
+			}
+			else if (ballWallColResult == Ball::EWallCollision::BottomCollision)
+			{
+				StartRound();
+				ResetBall();
+				soundFart.Play();
+			}
 		}
-		else if (ballWallColResult == 2)
+
+		break;
+		case EGameState::NoStarted:
 		{
-			StartRound();
-			ResetBall();
-			soundFart.Play();
+			if (wnd.kbd.KeyIsPressed(VK_RETURN))
+			{
+				StartRound();
+			}
 		}
-	}
-	else if (gameState == 0)
-	{
-		if (wnd.kbd.KeyIsPressed(VK_RETURN))
+		break;
+		case EGameState::ReadyWait:	
 		{
-			StartRound();
+			if ((curWaitTime += dt) > readyWaitTime)
+			{
+				gameState = EGameState::Playing;
+			}
 		}
-	}
-	else if (gameState == 3)
-	{
-		if ((curWaitTime += dt) > readyWaitTime)
-		{
-			gameState = 1;
-		}
+	break;
 	}
 }
 
@@ -158,11 +165,11 @@ void Game::StartRound()
 	{
 		curWaitTime = 0.0f;
 		soundReady.Play();
-		gameState = 3;
+		gameState = EGameState::ReadyWait;
 	}
 	else
 	{
-		gameState = 2;
+		gameState = EGameState::GameOver;
 	}
 	
 }
@@ -174,41 +181,39 @@ void Game::ResetBall()
 
 void Game::ComposeFrame()
 {
-	if ((gameState == 1) || (gameState == 3))
+	switch (gameState)
 	{
+	case EGameState::NoStarted:
+		SpriteCodex::DrawTitle(Graphics::GetScreenRect().GetCenter(), gfx);
+
+		break;
+
+	case EGameState::ReadyWait:
 		paddle.Draw(gfx);
 		lifeCounter.Draw(gfx);
-	}
+		SpriteCodex::DrawReady(Graphics::GetScreenRect().GetCenter(), gfx);
+		break;
 
-	if (gameState == 1)
-	{
+	case EGameState::Playing:
+		paddle.Draw(gfx);
+		lifeCounter.Draw(gfx);
 		ball.Draw(gfx);
+		break;
+
+	case EGameState::GameOver:
+		SpriteCodex::DrawGameOver(Graphics::GetScreenRect().GetCenter(), gfx);;
+		break;
 	}
 
-	if (gameState != 0)
+	// Draw bricks and wall aways, except for the title
+	if (gameState != EGameState::NoStarted)
 	{
 		// Draw bricks
 		for (const Brick& b : bricks)
 		{
 			b.Draw(gfx);
 		}
-
 		walls.Draw(gfx);
 	}
-
-	if (gameState == 0)
-	{
-		SpriteCodex::DrawTitle(Graphics::GetScreenRect().GetCenter(), gfx);
-
-	}
-
-	if (gameState == 2)
-	{
-		SpriteCodex::DrawGameOver(Graphics::GetScreenRect().GetCenter(), gfx);
-	}
-
-	if (gameState == 3)
-	{
-		SpriteCodex::DrawReady(Graphics::GetScreenRect().GetCenter(), gfx);
-	}
 }
+
